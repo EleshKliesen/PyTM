@@ -1,0 +1,19 @@
+# Credentials
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Nadeo & API Caches (Contains session tokens)
+NadeoLiveServices.json
+NadeoServices.json
+WeeklyShortsCache.json
+
+# IDE Folders
+.idea/
+.vscode/
+
+# Virtual Environments
+venv/
+env/
