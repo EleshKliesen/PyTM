@@ -1,5 +1,6 @@
 from API.Services.NadeoCore import NadeoCore
 from API.Services.NadeoLive import NadeoLive
+from API.Services.NadeoMeet import NadeoMeet
 from API.Services.TrackmaniaIO import TrackmaniaIO
 
 
@@ -21,6 +22,12 @@ class TrackmaniaAPI:
     def live(self) -> NadeoLive:
         if self._live is None:
             self._live = NadeoLive(self._auth, "live")
+        return self._live
+
+    @property
+    def meet(self) -> NadeoMeet:
+        if self._live is None:
+            self._live = NadeoMeet(self._auth, "live")
         return self._live
 
     @property
