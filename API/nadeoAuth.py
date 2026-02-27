@@ -120,6 +120,9 @@ class NadeoAuth:
                 new_data = r.json()
                 self._save(new_data, audience)
                 return new_data
+            else:
+                print(f"Refresh failed with status: {r.status_code}")
+                return None
         except Exception as e:
             print(f"Refresh failed: {e}")
         return None
