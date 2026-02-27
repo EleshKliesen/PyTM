@@ -29,10 +29,10 @@ class TrackmaniaAPI:
             self._io = TrackmaniaIO()
         return self._io
 
-    def get_weekly_data(self, club_id):
+    def get_weekly_data(self, club_id, offset=1):
         """Main entry point for main.py to fetch everything at once."""
         print("Fetching Weekly Shorts maps...")
-        map_uids, campaign_name = self.live.get_weekly_shorts_uids(offset=2)
+        map_uids, campaign_name = self.live.get_weekly_shorts_uids(offset)
         print(f"Fetched: {campaign_name}")
 
         if not map_uids:
