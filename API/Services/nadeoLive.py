@@ -66,7 +66,7 @@ class NadeoLive(NadeoService):
                     target_week = all_weeks[offset - 1]
                     # If offset is 1 (last week), we must check if it's expired
                     if offset > 1 or time.time() < target_week.get("expires", 0):
-                        print("Found in Cache")
+                        print("Found weekly shorts in Cache")
                         return target_week.get("uids", []), target_week.get("campaign_name", "Unknown")
             except (json.JSONDecodeError, KeyError):
                 all_weeks = []

@@ -19,11 +19,17 @@ class NadeoAuth:
             "live": os.path.join(self.TOKEN_DIR, "NadeoLiveServices.json"),
             "core": os.path.join(self.TOKEN_DIR, "NadeoServices.json")
         }
+        self._token_cache = {}
         self.ubi_ticket = None
 
     def _save(self, data, audience):
+        """Updates memory cache and saves to disk."""
         data['timestamp'] = time.time()
-        with open(self.files[audience], "w") as f:
+        self._token_cache[audience] = data
+
+        file_path = self.files[audience]
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, "w") as f:
             json.dump(data, f, indent=4)
 
     def _get_auth(self, aud):
@@ -52,7 +58,9 @@ class NadeoAuth:
             print(f"Getting {audience_name} token")
             r = requests.post(auth_url, headers=n_headers, json={"audience": audience_name})
             r.raise_for_status()
-            self._save(r.json(), aud)
+            auth_data = r.json()
+            self._save(auth_data, aud)
+            return auth_data['accessToken']
         except requests.exceptions.HTTPError as e:
             # If the ticket expired while the script was running, clear it and try once more
             if r.status_code == 401:
@@ -61,22 +69,57 @@ class NadeoAuth:
             raise e
 
     def get_token(self, audience):
-        file_path = self.files[audience]
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                tokens = json.load(f)
-            if time.time() - tokens.get('timestamp', 0) < 3300:
-                return tokens['accessToken']
+        token_data = self._load_token(audience)
 
-            # Try refresh
-            print(f"Refreshing {audience} token...")
-            refresh_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh"
-            r = requests.post(refresh_url, headers={"Authorization": f"nadeo_v1 t={tokens['refreshToken']}",
-                                                    "User-Agent": self.user_agent})
+        # 1. Check if the in-memory/loaded token is still valid (3300s = 55 mins)
+        if token_data and (time.time() - token_data.get('timestamp', 0) < 3300):
+            return token_data['accessToken']
+
+        # 2. Token is expired or missing - Try to refresh
+        if token_data and 'refreshToken' in token_data:
+            new_tokens = self._refresh_token(audience, token_data['refreshToken'])
+            if new_tokens:
+                return new_tokens['accessToken']
+
+        # 3. Else Perform full login
+        print(f"Token required for {audience}...")
+        return self._get_auth(audience)
+
+    def _load_token(self, audience):
+        """Checks memory first, then disk."""
+        # Check in-memory cache first
+        if audience in self._token_cache:
+            return self._token_cache[audience]
+
+        # Check disk if not in memory
+        file_path = self.files.get(audience)
+        if file_path and os.path.exists(file_path):
+            try:
+                with open(file_path, "r") as f:
+                    data = json.load(f)
+                    self._token_cache[audience] = data
+                    return data
+            except (json.JSONDecodeError, IOError):
+                pass
+        return None
+
+    def _refresh_token(self, audience, refresh_token):
+        """Attempts to use the refresh token to get a new access token."""
+        print(f"Refreshing {audience} token...")
+        url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh"
+        try:
+            r = requests.post(
+                url,
+                headers={
+                    "Authorization": f"nadeo_v1 t={refresh_token}",
+                    "User-Agent": self.user_agent
+                },
+                timeout=10
+            )
             if r.status_code == 200:
-                self._save(r.json(), audience)
-                return r.json()['accessToken']
-
-        self._get_auth(audience)
-        with open(file_path, "r") as f:
-            return json.load(f)['accessToken']
+                new_data = r.json()
+                self._save(new_data, audience)
+                return new_data
+        except Exception as e:
+            print(f"Refresh failed: {e}")
+        return None
