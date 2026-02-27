@@ -1,6 +1,6 @@
 import requests
 
-from API.NadeoService import NadeoService
+from API.Services.NadeoService import NadeoService
 
 
 class NadeoCore(NadeoService):

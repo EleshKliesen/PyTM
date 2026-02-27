@@ -4,7 +4,7 @@ import os
 import time
 import datetime
 
-from API.NadeoService import NadeoService
+from API.Services.NadeoService import NadeoService
 
 
 class NadeoLive(NadeoService):
@@ -22,6 +22,29 @@ class NadeoLive(NadeoService):
 
         next_monday = now.replace(hour=3, minute=0, second=0, microsecond=0) + datetime.timedelta(days=days_ahead)
         return next_monday.timestamp()
+
+    def get_club_id(self, club='mine', length=1, offset=0):
+        """Fetches the ID of the first club the authenticated user is in."""
+        # The URL remains the same
+        url = f"{self.BASE_URL}/token/club/{club}"
+
+        try:
+            # We use self.get_headers() so we don't have to pass tokens manually
+            r = requests.get(url, headers=self.get_headers(), params={"length": length, "offset": offset}, timeout=10)
+            r.raise_for_status()
+
+            clubs = r.json().get("clubList", [])
+            if clubs:
+                club_id = clubs[0].get("id")
+                club_name = self.clean_name(clubs[0].get("name"))
+                print(f"Found Club Name: {club_name}, Club ID: {club_id}")
+                return club_id
+
+            print("No clubs found for this account.")
+            return None
+        except Exception as e:
+            print(f"Live API Error (Club Lookup): {e}")
+            return None
 
     def get_weekly_shorts_uids(self, length=1, offset=1):
         """Gets map UIDs and the campaign name with local caching."""
