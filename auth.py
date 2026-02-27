@@ -16,30 +16,46 @@ class NadeoAuth:
             "live": "NadeoLiveServices.json",
             "core": "NadeoServices.json"
         }
+        self.ubi_ticket = None
 
     def _save(self, data, audience):
         data['timestamp'] = time.time()
         with open(self.files[audience], "w") as f:
             json.dump(data, f, indent=4)
 
-    def _get_full_auth(self):
-        print("Performing full Ubisoft authentication...")
-        creds = base64.b64encode(f"{config.EMAIL}:{config.PASSWORD}".encode()).decode()
-        headers = {"Content-Type": "application/json", "Ubi-AppId": self.ubi_app_id, "Authorization": f"Basic {creds}",
-                   "User-Agent": self.user_agent}
+    def _get_auth(self, aud):
+        # Only perform Ubisoft login if we don't have a ticket yet
+        if not self.ubi_ticket:
+            print("Performing full Ubisoft authentication...")
+            creds = base64.b64encode(f"{config.EMAIL}:{config.PASSWORD}".encode()).decode()
+            headers = {
+                "Content-Type": "application/json",
+                "Ubi-AppId": self.ubi_app_id,
+                "Authorization": f"Basic {creds}",
+                "User-Agent": self.user_agent
+            }
 
-        res = requests.post("https://public-ubiservices.ubi.com/v3/profiles/sessions", headers=headers)
-        res.raise_for_status()
-        ticket = res.json().get("ticket")
+            res = requests.post("https://public-ubiservices.ubi.com/v3/profiles/sessions", headers=headers)
+            res.raise_for_status()
+            self.ubi_ticket = res.json().get("ticket")
 
-        # Get both tokens immediately
+        # Now use the ticket (either fresh or from memory) to get the specific Nadeo token
         auth_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices"
-        n_headers = {"Authorization": f"ubi_v1 t={ticket}", "User-Agent": self.user_agent}
+        n_headers = {"Authorization": f"ubi_v1 t={self.ubi_ticket}", "User-Agent": self.user_agent}
 
-        for aud in ["live", "core"]:
-            audience_name = "NadeoLiveServices" if aud == "live" else "NadeoServices"
+        audience_name = "NadeoLiveServices" if aud == "live" else "NadeoServices"
+
+        try:
+            print(f"Getting {audience_name} token")
             r = requests.post(auth_url, headers=n_headers, json={"audience": audience_name})
+            r.raise_for_status()
             self._save(r.json(), aud)
+        except requests.exceptions.HTTPError as e:
+            # If the ticket expired while the script was running, clear it and try once more
+            if r.status_code == 401:
+                self.ubi_ticket = None
+                return self._get_auth(aud)
+            raise e
 
     def get_token(self, audience):
         file_path = self.files[audience]
@@ -58,6 +74,6 @@ class NadeoAuth:
                 self._save(r.json(), audience)
                 return r.json()['accessToken']
 
-        self._get_full_auth()
+        self._get_auth(audience)
         with open(file_path, "r") as f:
             return json.load(f)['accessToken']
