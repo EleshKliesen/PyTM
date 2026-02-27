@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import time
+
 import requests
 
 import authConfig
@@ -9,12 +10,14 @@ import config
 
 
 class NadeoAuth:
+    TOKEN_DIR = "data/tokens/"
+
     def __init__(self):
         self.ubi_app_id = "86263886-327a-4328-ac69-527f0d20a237"
         self.user_agent = authConfig.USERAGENT
         self.files = {
-            "live": "NadeoLiveServices.json",
-            "core": "NadeoServices.json"
+            "live": os.path.join(self.TOKEN_DIR, "NadeoLiveServices.json"),
+            "core": os.path.join(self.TOKEN_DIR, "NadeoServices.json")
         }
         self.ubi_ticket = None
 
@@ -39,7 +42,7 @@ class NadeoAuth:
             res.raise_for_status()
             self.ubi_ticket = res.json().get("ticket")
 
-        # Now use the ticket (either fresh or from memory) to get the specific Nadeo token
+        # Use the ticket to get the specific Nadeo token
         auth_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices"
         n_headers = {"Authorization": f"ubi_v1 t={self.ubi_ticket}", "User-Agent": self.user_agent}
 

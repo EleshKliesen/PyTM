@@ -1,5 +1,5 @@
-from auth import NadeoAuth
-from API.api import TrackmaniaAPI
+from API.nadeoAuth import NadeoAuth
+from API.trackmaniaApi import TrackmaniaAPI
 
 
 def display_leaderboard(map_name, records, member_map):
@@ -19,7 +19,6 @@ def display_leaderboard(map_name, records, member_map):
 
 
 def main():
-    # Setup - No network calls yet
     api = TrackmaniaAPI(NadeoAuth())
     club_id = "89488"  # KERORINPA
     # club_id = api.live.get_club_id()

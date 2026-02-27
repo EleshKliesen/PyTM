@@ -1,7 +1,7 @@
-from API.Services.NadeoCore import NadeoCore
-from API.Services.NadeoLive import NadeoLive
-from API.Services.NadeoMeet import NadeoMeet
-from API.Services.TrackmaniaIO import TrackmaniaIO
+from API.Services.nadeoCore import NadeoCore
+from API.Services.nadeoLive import NadeoLive
+from API.Services.nadeoMeet import NadeoMeet
+from API.Services.trackmaniaIO import TrackmaniaIO
 
 
 class TrackmaniaAPI:

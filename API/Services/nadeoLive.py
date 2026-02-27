@@ -1,10 +1,11 @@
-import requests
+import datetime
 import json
 import os
 import time
-import datetime
 
-from API.Services.NadeoService import NadeoService
+import requests
+
+from API.Services.nadeoService import NadeoService
 
 
 class NadeoLive(NadeoService):
@@ -24,12 +25,11 @@ class NadeoLive(NadeoService):
         return next_monday.timestamp()
 
     def get_club_id(self, club='mine', length=1, offset=0):
-        """Fetches the ID of the first club the authenticated user is in."""
+        """Fetches the ID of the club the authenticated user is in."""
         # The URL remains the same
         url = f"{self.BASE_URL}/token/club/{club}"
 
         try:
-            # We use self.get_headers() so we don't have to pass tokens manually
             r = requests.get(url, headers=self.get_headers(), params={"length": length, "offset": offset}, timeout=10)
             r.raise_for_status()
 
@@ -48,7 +48,7 @@ class NadeoLive(NadeoService):
 
     def get_weekly_shorts_uids(self, length=1, offset=1):
         """Gets map UIDs and the campaign name with local caching."""
-        cache_file = "WeeklyShortsCache.json"
+        cache_file = os.path.join(self.CACHE_DIR, "WeeklyShortsCache.json")
         all_weeks = []
 
         # 1. Load existing cache if it exists
@@ -64,14 +64,14 @@ class NadeoLive(NadeoService):
                 # Note: offset 1 is index 0
                 if len(all_weeks) >= offset:
                     target_week = all_weeks[offset - 1]
-                    # If offset is 1 (current week), we must check if it's expired
+                    # If offset is 1 (last week), we must check if it's expired
                     if offset > 1 or time.time() < target_week.get("expires", 0):
                         print("Found in Cache")
                         return target_week.get("uids", []), target_week.get("campaign_name", "Unknown")
             except (json.JSONDecodeError, KeyError):
                 all_weeks = []
 
-        # 3. Fetch fresh if offset not found or current week expired
+        # 3. Fetch fresh if offset not found or last week expired
         print(f"Fetching Weekly Shorts data (Offset: {offset})...")
         url = f"{self.BASE_URL}/campaign/weekly-shorts"
         try:

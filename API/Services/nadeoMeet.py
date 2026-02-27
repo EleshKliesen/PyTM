@@ -1,4 +1,4 @@
-from API.Services.NadeoService import NadeoService
+from API.Services.nadeoService import NadeoService
 
 
 class NadeoMeet(NadeoService):

@@ -1,16 +1,19 @@
-import requests
+import os
 import re
+
 import authConfig
 
 
 class NadeoService:
+    CACHE_DIR = os.path.join("data", "cache")
+
     def __init__(self, auth_provider, audience):
         self.auth = auth_provider
         self.audience = audience
         self.user_agent = authConfig.USERAGENT
 
     def get_headers(self):
-        """Automatically fetches fresh tokens from your NadeoAuth class."""
+        """Fetches fresh tokens from your NadeoAuth class."""
         token = self.auth.get_token(self.audience)
         return {
             "Authorization": f"nadeo_v1 t={token}",
