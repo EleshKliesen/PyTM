@@ -10,6 +10,9 @@ Prints Weekly Leaderboard of your (first club)?
 ## Sample output
 
 ```text
+----------------------------------------
+Weekly short: Week 62
+
 --- Map: 1 - Aelora ---
 Pos  | Player               | Time      
 ----------------------------------------

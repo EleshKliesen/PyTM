@@ -34,6 +34,8 @@ def main():
         print("Couldn't find leaderboards")
         return
 
+    print(f"\n{'-' * 40}")
+    print(f"Weekly short: {campaign_name}")
     for item in leaderboards:
         display_leaderboard(
             map_name=item['name'],
