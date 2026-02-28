@@ -29,6 +29,7 @@ def main():
     print("Fetching Weekly Shorts data...")
     leaderboards = api.get_weekly_data(club_id)
     if not leaderboards:
+        print("Couldn't find leaderboards")
         return
 
     for item in leaderboards:

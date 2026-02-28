@@ -1,5 +1,6 @@
 import os
 import re
+import threading
 
 import authConfig
 
@@ -11,16 +12,18 @@ class NadeoService:
         self.auth = auth_provider
         self.audience = audience
         self.user_agent = authConfig.USERAGENT
+        self._lock = threading.Lock()
         os.makedirs(self.CACHE_DIR, exist_ok=True)
 
     def get_headers(self):
-        """Fetches fresh tokens from your NadeoAuth class."""
-        token = self.auth.get_token(self.audience)
-        return {
-            "Authorization": f"nadeo_v1 t={token}",
-            "User-Agent": self.user_agent,
-            "Accept": "application/json"
-        }
+        """Thread-safe fetch of fresh tokens from your NadeoAuth class."""
+        with self._lock:
+            token = self.auth.get_token(self.audience)
+            return {
+                "Authorization": f"nadeo_v1 t={token}",
+                "User-Agent": self.user_agent,
+                "Accept": "application/json"
+            }
 
     @staticmethod
     def clean_name(name):

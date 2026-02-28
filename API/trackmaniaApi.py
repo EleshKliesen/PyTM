@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from API.Services.nadeoCore import NadeoCore
 from API.Services.nadeoLive import NadeoLive
 from API.Services.nadeoMeet import NadeoMeet
@@ -41,8 +43,11 @@ class TrackmaniaAPI:
         print("Fetching Weekly Shorts maps...")
         campaign = self.live.get_weekly_shorts(offset=offset)
         if not campaign:
+            print("No campaign found for the given offset.")
             return []
-        print(f"Fetched: {campaign['campaign_name']}")
+
+        campaign_name = campaign['campaign_name']
+        print(f"Fetched: {campaign_name}")
 
         uids = campaign.get("uids", [])
         map_names = campaign.get("map_names", {})
@@ -50,19 +55,23 @@ class TrackmaniaAPI:
         if not map_names:
             print("Fetching map metadata...")
             map_names = self.core.get_map_names(uids)
-            self.core.update_cache_metadata(campaign["campaign_name"], map_names)
+            self.core.update_cache_metadata(campaign_name, map_names)
 
         print("Fetching Club Member names...")
         member_map = self.io.get_club_members(club_id)
         print(f"Loaded {len(member_map)} members.")
 
-        results = []
-        for uid in uids:
+        def fetch_task(uid):
             display_name = map_names.get(uid, uid)
             records = self.live.get_pb_leaderboard(uid, club_id)
-            results.append({
+            return {
                 "name": display_name,
                 "records": records,
                 "member_map": member_map
-            })
+            }
+
+        # Use a thread pool to hit the API in parallel
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results = list(executor.map(fetch_task, uids))
+
         return results
