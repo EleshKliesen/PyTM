@@ -1,3 +1,4 @@
+import config
 from API.nadeoAuth import NadeoAuth
 from API.trackmaniaApi import TrackmaniaAPI
 
@@ -20,15 +21,16 @@ def display_leaderboard(map_name, records, member_map):
 
 def main():
     api = TrackmaniaAPI(NadeoAuth())
-    club_id = "89488"  # KERORINPA
-    # club_id = api.live.get_club_id()
+    club_id = config.CLUB_ID
+    # If you don't know your club
+    # club_id = api.live.get_club_by_id()
     # if not club_id:
     #     return
 
     # This single call orchestrates all services and auth
     print("Fetching Weekly Shorts data...")
-    leaderboards = api.get_weekly_data(club_id)
-    if not leaderboards:
+    campaign_name, leaderboards = api.get_weekly_data(club_id)
+    if not campaign_name:
         print("Couldn't find leaderboards")
         return
 

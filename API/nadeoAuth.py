@@ -5,7 +5,6 @@ import time
 
 import requests
 
-import authConfig
 import config
 
 
@@ -22,7 +21,7 @@ class NadeoAuth:
             cls._instance = super(NadeoAuth, cls).__new__(cls)
             # Initialize shared state only once
             cls._instance.ubi_app_id = "86263886-327a-4328-ac69-527f0d20a237"
-            cls._instance.user_agent = authConfig.USERAGENT
+            cls._instance.user_agent = config.USER_AGENT
             cls._instance.files = {
                 "NadeoLiveServices": os.path.join(cls.TOKEN_DIR, "NadeoLiveServices.json"),
                 "NadeoServices": os.path.join(cls.TOKEN_DIR, "NadeoServices.json")

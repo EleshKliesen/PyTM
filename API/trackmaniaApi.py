@@ -44,7 +44,7 @@ class TrackmaniaAPI:
         campaign = self.live.get_weekly_shorts(offset=offset)
         if not campaign:
             print("No campaign found for the given offset.")
-            return []
+            return None, []
 
         campaign_name = campaign['campaign_name']
         print(f"Fetched: {campaign_name}")
@@ -74,4 +74,4 @@ class TrackmaniaAPI:
         with ThreadPoolExecutor(max_workers=5) as executor:
             results = list(executor.map(fetch_task, uids))
 
-        return results
+        return campaign_name, results

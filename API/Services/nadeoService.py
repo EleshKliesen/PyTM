@@ -2,7 +2,7 @@ import os
 import re
 import threading
 
-import authConfig
+import config
 
 
 class NadeoService:
@@ -11,7 +11,7 @@ class NadeoService:
     def __init__(self, auth_provider, audience):
         self.auth = auth_provider
         self.audience = audience
-        self.user_agent = authConfig.USERAGENT
+        self.user_agent = config.USER_AGENT
         self._lock = threading.Lock()
         os.makedirs(self.CACHE_DIR, exist_ok=True)
 

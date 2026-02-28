@@ -1,13 +1,13 @@
 import requests
 
-import authConfig
+import config
 
 
 class TrackmaniaIO:
     BASE_URL = "https://trackmania.io/api"
 
     def __init__(self):
-        self.headers = {"User-Agent": authConfig.USERAGENT}
+        self.headers = {"User-Agent": config.USER_AGENT}
 
     def get_club_members(self, club_id):
         url = f"{self.BASE_URL}/club/{club_id}/members/0"

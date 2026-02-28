@@ -1,13 +1,21 @@
-# Credentials
-config.py
+# Credentials & Config
+.env*
+!.env.example
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Nadeo & API Caches (Contains session tokens)
-data
+# Nadeo & API Caches (Contains session tokens & local data)
+data/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
 
 # IDE Folders
 .idea/
