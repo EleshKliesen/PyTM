@@ -10,18 +10,28 @@ import config
 
 
 class NadeoAuth:
+    _instance = None
     TOKEN_DIR = "data/tokens/"
+    AUDIENCE_MAP = {
+        "live": "NadeoLiveServices",
+        "core": "NadeoServices"
+    }
 
-    def __init__(self):
-        self.ubi_app_id = "86263886-327a-4328-ac69-527f0d20a237"
-        self.user_agent = authConfig.USERAGENT
-        self.files = {
-            "live": os.path.join(self.TOKEN_DIR, "NadeoLiveServices.json"),
-            "core": os.path.join(self.TOKEN_DIR, "NadeoServices.json")
-        }
-        self._token_cache = {}
-        self.ubi_ticket = None
-        os.makedirs(self.TOKEN_DIR, exist_ok=True)
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(NadeoAuth, cls).__new__(cls)
+            # Initialize shared state only once
+            cls._instance.ubi_app_id = "86263886-327a-4328-ac69-527f0d20a237"
+            cls._instance.user_agent = authConfig.USERAGENT
+            cls._instance.files = {
+                "NadeoLiveServices": os.path.join(cls.TOKEN_DIR, "NadeoLiveServices.json"),
+                "NadeoServices": os.path.join(cls.TOKEN_DIR, "NadeoServices.json")
+            }
+            cls._instance._token_cache = {}
+            cls._instance.ubi_ticket = None
+            cls._instance.session = requests.Session()  # Keep-Alive connection
+            os.makedirs(cls.TOKEN_DIR, exist_ok=True)
+        return cls._instance
 
     def _save(self, data, audience):
         """Updates memory cache and saves to disk."""
@@ -44,7 +54,7 @@ class NadeoAuth:
                 "User-Agent": self.user_agent
             }
 
-            res = requests.post("https://public-ubiservices.ubi.com/v3/profiles/sessions", headers=headers)
+            res = self.session.post("https://public-ubiservices.ubi.com/v3/profiles/sessions", headers=headers)
             res.raise_for_status()
             self.ubi_ticket = res.json().get("ticket")
 
@@ -52,12 +62,13 @@ class NadeoAuth:
         auth_url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/ubiservices"
         n_headers = {"Authorization": f"ubi_v1 t={self.ubi_ticket}", "User-Agent": self.user_agent}
 
-        audience_name = "NadeoLiveServices" if aud == "live" else "NadeoServices"
-
         try:
-            print(f"Getting {audience_name} token")
-            r = requests.post(auth_url, headers=n_headers, json={"audience": audience_name})
+            print(f"Getting {aud} token")
+            r = self.session.post(auth_url, headers=n_headers, json={"audience": aud})
+
+            # Handle expired ticket inside the try
             if r.status_code == 401:
+                print("Ubi Ticket expired. Retrying...")
                 self.ubi_ticket = None
                 return self._get_auth(aud)
 
@@ -68,7 +79,8 @@ class NadeoAuth:
         except requests.exceptions.HTTPError as e:
             raise e
 
-    def get_token(self, audience):
+    def get_token(self, aud):
+        audience = self.AUDIENCE_MAP[aud]
         token_data = self._load_token(audience)
 
         # 1. Check if the in-memory/loaded token is still valid (3300s = 55 mins)
@@ -108,7 +120,7 @@ class NadeoAuth:
         print(f"Refreshing {audience} token...")
         url = "https://prod.trackmania.core.nadeo.online/v2/authentication/token/refresh"
         try:
-            r = requests.post(
+            r = self.session.post(
                 url,
                 headers={
                     "Authorization": f"nadeo_v1 t={refresh_token}",
