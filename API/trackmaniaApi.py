@@ -39,21 +39,25 @@ class TrackmaniaAPI:
     def get_weekly_data(self, club_id, offset=1):
         """Main entry point for main.py to fetch everything at once."""
         print("Fetching Weekly Shorts maps...")
-        map_uids, campaign_name = self.live.get_weekly_shorts_uids(offset)
-        print(f"Fetched: {campaign_name}")
-
-        if not map_uids:
+        campaign = self.live.get_weekly_shorts(offset=offset)
+        if not campaign:
             return []
+        print(f"Fetched: {campaign['campaign_name']}")
 
-        print("Fetching map metadata...")
-        map_names = self.core.get_map_names(map_uids)
+        uids = campaign.get("uids", [])
+        map_names = campaign.get("map_names", {})
+
+        if not map_names:
+            print("Fetching map metadata...")
+            map_names = self.core.get_map_names(uids)
+            self.core.update_cache_metadata(campaign["campaign_name"], map_names)
 
         print("Fetching Club Member names...")
         member_map = self.io.get_club_members(club_id)
         print(f"Loaded {len(member_map)} members.")
 
         results = []
-        for uid in map_uids:
+        for uid in uids:
             display_name = map_names.get(uid, uid)
             records = self.live.get_pb_leaderboard(uid, club_id)
             results.append({

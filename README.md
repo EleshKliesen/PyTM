@@ -1,5 +1,8 @@
-Prints Weekly Leaderboard of your (first club)? 
+Prints Weekly Leaderboard of your (first club)?
 
-**Vibecoded** - Bad code ahead. Use at your own peril.
+**Vibecoded** - Bad code ahead.
 
-Update config.py with your own credentials, then use change the club_id part in main.py to use for yourself
+## Setup
+
+1. Update `config.py` with your Ubisoft `EMAIL` and `PASSWORD` and set to your own `PROJECTNAME`.
+2. Update the `club_id` in `main.py` for your specific club or use the commented out API.
