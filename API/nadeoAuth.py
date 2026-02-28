@@ -57,15 +57,15 @@ class NadeoAuth:
         try:
             print(f"Getting {audience_name} token")
             r = requests.post(auth_url, headers=n_headers, json={"audience": audience_name})
+            if r.status_code == 401:
+                self.ubi_ticket = None
+                return self._get_auth(aud)
+
             r.raise_for_status()
             auth_data = r.json()
             self._save(auth_data, aud)
             return auth_data['accessToken']
         except requests.exceptions.HTTPError as e:
-            # If the ticket expired while the script was running, clear it and try once more
-            if r.status_code == 401:
-                self.ubi_ticket = None
-                return self._get_auth(aud)
             raise e
 
     def get_token(self, audience):
