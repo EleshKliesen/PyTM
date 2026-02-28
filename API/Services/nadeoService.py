@@ -11,6 +11,7 @@ class NadeoService:
         self.auth = auth_provider
         self.audience = audience
         self.user_agent = authConfig.USERAGENT
+        os.makedirs(self.CACHE_DIR, exist_ok=True)
 
     def get_headers(self):
         """Fetches fresh tokens from your NadeoAuth class."""

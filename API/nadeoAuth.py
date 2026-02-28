@@ -21,6 +21,7 @@ class NadeoAuth:
         }
         self._token_cache = {}
         self.ubi_ticket = None
+        os.makedirs(self.TOKEN_DIR, exist_ok=True)
 
     def _save(self, data, audience):
         """Updates memory cache and saves to disk."""
@@ -28,7 +29,6 @@ class NadeoAuth:
         self._token_cache[audience] = data
 
         file_path = self.files[audience]
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, "w") as f:
             json.dump(data, f, indent=4)
 
