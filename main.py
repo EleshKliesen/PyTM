@@ -21,7 +21,6 @@ def filter_non_jp_players(leaderboards):
             if r['accountId'] in item['member_map']
         ]
 
-        filtered_records.sort(key=lambda x: x['score'])
         filtered_records = filtered_records[:5]
 
         for i, record in enumerate(filtered_records, start=1):
@@ -92,14 +91,15 @@ def display_leaderboard(campaign_name, leaderboards):
 def main():
     api = TrackmaniaAPI(NadeoAuth())
     club_id = config.CLUB_ID
-    # If you don't know your club
-    # club_id = api.live.get_club_by_id()
-    # if not club_id:
-    #     return
+    if not club_id:
+        club_id = api.live.get_club_by_id()
+        if not club_id:
+            return
 
     # This single call orchestrates all services and auth
     print("Fetching Weekly Shorts data...")
-    campaign_name, leaderboards = api.get_weekly_data(club_id)
+    # Change offset to get older weeks. offset=1: Last week
+    campaign_name, leaderboards = api.get_weekly_data(club_id, offset=1)
     if not campaign_name:
         print("Couldn't find leaderboards")
         return

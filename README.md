@@ -1,80 +1,68 @@
-Prints Weekly Leaderboard of your (first club)?
+Simple py wrapper. Only has stuff to print weekly shorts right now.
 
 **Vibecoded** - Bad code ahead.
 
 ## Setup
 
 1. Create `.env` copying `.env.example` and setting your own variables
-2. If you don't know your club id, run `main.py` and use the commented out section.
 
 ## Sample output
 
 ```text
 ----------------------------------------
-Weekly short: Week 62
+Weekly short: Week 63
 
---- Map: 1 - Aelora ---
-Pos  | Player               | Time      
-----------------------------------------
-1    | SHIXPAC              | 14.787s
-2    | Elesh_Kliesen        | 14.898s
-3    | Kero3x               | 15.555s
-4    | abcol1               | 15.603s
-5    | YUKI_TANAKA_VT       | 16.568s
-6    | K1City               | 16.643s
-7    | Jelan                | 17.544s
+--- Map: 1 - Bobs Canyon ---
+順位  | ドライバー             | タイム      | デルタ     
+----------------------------------------------------
+1    | Elesh_Kliesen        | 15.924s    | Interval  
+2    | Kero3x               | 16.078s    | +0.154s   
+3    | Shimo74              | 16.098s    | +0.174s   
+4    | SHIXPAC              | 16.131s    | +0.207s   
+5    | Jelan                | 16.738s    | +0.814s   
 
---- Map: 2 - Sovereign ft' Inleader ---
-Pos  | Player               | Time      
-----------------------------------------
-1    | SHIXPAC              | 16.748s
-2    | abcol1               | 16.870s
-3    | Kero3x               | 16.998s
-4    | Elesh_Kliesen        | 17.085s
-5    | YUKI_TANAKA_VT       | 17.535s
-6    | Jelan                | 19.269s
-7    | K1City               | 19.336s
+--- Map: 2 - Signal ---
+順位  | ドライバー             | タイム      | デルタ     
+----------------------------------------------------
+1    | Shimo74              | 16.791s    | Interval  
+2    | Kero3x               | 16.891s    | +0.100s   
+3    | Elesh_Kliesen        | 16.985s    | +0.194s   
+4    | SHIXPAC              | 17.038s    | +0.247s   
+5    | Jelan                | 18.825s    | +2.034s   
 
---- Map: 3 - Novacoast ---
-Pos  | Player               | Time      
-----------------------------------------
-1    | SHIXPAC              | 15.784s
-2    | YUKI_TANAKA_VT       | 15.873s
-3    | Kero3x               | 15.992s
-4    | Elesh_Kliesen        | 16.202s
-5    | abcol1               | 16.823s
-6    | Jelan                | 17.764s
-7    | K1City               | 18.527s
+--- Map: 3 - grass sloucher ---
+順位  | ドライバー             | タイム      | デルタ     
+----------------------------------------------------
+1    | Kero3x               | 16.988s    | Interval  
+2    | Shimo74              | 17.085s    | +0.097s   
+3    | Elesh_Kliesen        | 17.132s    | +0.144s   
+4    | SHIXPAC              | 17.388s    | +0.400s   
+5    | Jelan                | 19.338s    | +2.350s   
 
---- Map: 4 - Frosted Facility ---
-Pos  | Player               | Time      
-----------------------------------------
-1    | abcol1               | 17.322s
-2    | SHIXPAC              | 17.358s
-3    | Kero3x               | 17.405s
-4    | Jelan                | 17.757s
-5    | YUKI_TANAKA_VT       | 18.062s
-6    | Elesh_Kliesen        | 18.257s
-7    | K1City               | 19.178s
+--- Map: 4 - Firious Speeds ft' Heravan ---
+順位  | ドライバー             | タイム      | デルタ     
+----------------------------------------------------
+1    | Shimo74              | 17.737s    | Interval  
+2    | Elesh_Kliesen        | 17.873s    | +0.136s   
+3    | SHIXPAC              | 18.070s    | +0.333s   
+4    | Kero3x               | 18.337s    | +0.600s   
+5    | Jelan                | 18.525s    | +0.788s   
 
---- Map: 5 - full send ---
-Pos  | Player               | Time      
-----------------------------------------
-1    | SHIXPAC              | 15.822s
-2    | Elesh_Kliesen        | 15.835s
-3    | SoftYuki             | 15.857s
-4    | Kero3x               | 15.895s
-5    | abcol1               | 16.150s
-6    | YUKI_TANAKA_VT       | 16.498s
-7    | K1City               | 17.388s
-8    | Jelan                | 18.267s
+--- Map: 5 - Quack-Man ft' geo ---
+順位  | ドライバー             | タイム      | デルタ     
+----------------------------------------------------
+1    | Elesh_Kliesen        | 14.568s    | Interval  
+2    | Kero3x               | 15.061s    | +0.493s   
+3    | SHIXPAC              | 16.020s    | +1.452s   
+4    | K1City               | 16.717s    | +2.149s   
+5    | Jelan                | 19.325s    | +4.757s
 ```
 
 ## Troubleshooting
 
 It doesn't get my club
 
-    Go to https://trackmania.io/#/clubs/
+    Go to https://trackmania.io/#/clubs/ find your club, then get the id from the url
 
 I updated to the latest and it doesn't work anymore
 
