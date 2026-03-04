@@ -31,7 +31,7 @@ def filter_non_jp_players(leaderboards):
 
 def format_tm_time(ms):
     """Formats milliseconds into HH:MM:SS.ms, omitting hours/minutes if 0."""
-    if ms < 0: return "0.000s"
+    if ms < 0: return "Secret"
 
     seconds, milliseconds = divmod(ms, 1000)
     minutes, seconds = divmod(seconds, 60)
@@ -68,11 +68,14 @@ def display_map_records(map_name, records, member_map):
         time_str = format_tm_time(current_score)
 
         # Handle Delta
-        if entry.get('position') == 1:
-            delta_str = "Interval"
+        if current_score < 0 or top_score < 0:
+            delta_str = 'N/A'
         else:
-            delta_ms = current_score - top_score
-            delta_str = f"+{format_tm_time(delta_ms)}"
+            if entry.get('position') == 1:
+                delta_str = "Interval"
+            else:
+                delta_ms = current_score - top_score
+                delta_str = f"+{format_tm_time(delta_ms)}"
 
         print(f"{entry.get('position'):<4} | {name[:20]:<20} | {time_str:<10} | {delta_str:<10}")
 
